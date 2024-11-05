@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "tap-tap-backend": {
+      "candid": "src/tap-tap-backend/tap-tap-backend.did",
+      "package": "tap-tap-backend",
+      "type": "rust"
+    },
+    "tap-tap-frontend": {
+      "dependencies": [
+        "tap-tap-backend"
+      ],
+      "source": [
+        "src/tap-tap-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "tap-tap-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
