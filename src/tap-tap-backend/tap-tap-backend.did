@@ -1,3 +1,6 @@
 service : {
     "greet": (text) -> (text) query;
+    "get_balance": () -> (nat) query; // No input needed; only checks the caller's identity
+    "increment_balance": () -> ();
+    "get_user_id": () -> (text) query;
 }
