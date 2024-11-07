@@ -7,11 +7,9 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-mio = "1.0"
-ic-cdk = "0.17"  # Keep the IC SDK version for interacting with the Internet Computer
-ic-cdk-macros = "0.17"  # Ensure this matches the ic-cdk version
-candid = "0.10"  # Compatible version for encoding/decoding Candid types
-serde = "1.0"  # For serialization/deserialization
-serde_cbor = "0.11.2"  # For additional CBOR support
-tokio = { version = "1", features = ["full"] }  # For async operations like HTTP requests
-reqwest = { version = "0.11", features = ["json"] }  # For making HTTP requests (external to IC)
+candid = "0.10"  # For Candid types and compatibility
+ic-cdk = "0.16"  # DFINITY's Canister Development Kit
+ic-cdk-timers = "0.10"  # Timers (remove if unnecessary)
+serde = { version = "1.0", features = ["derive"] }  # For serialization/deserialization
+serde_cbor = "0.11"  # For CBOR serialization, if needed
+serde_bytes = "0.11"  # For handling byte arrays in serde

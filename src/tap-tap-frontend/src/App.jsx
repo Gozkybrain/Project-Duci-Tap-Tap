@@ -1,129 +1,134 @@
-import React, { useState, useEffect } from 'react';
-import { Actor, HttpAgent } from '@dfinity/agent';
-import { AuthClient } from '@dfinity/auth-client';
-
-const BACKEND_CANISTER_ID = 'b77ix-eeaaa-aaaaa-qaada-cai';
-
-const idlFactory = ({ IDL }) => {
-  return IDL.Service({
-    'get_balance': IDL.Func([], [IDL.Nat], ['query']), // No input needed for `get_balance`
-    'increment_balance': IDL.Func([], [], ['update']),
-    'get_user_id': IDL.Func([], [IDL.Text], ['query']),
-  });
-};
-
-const tap_tap_backend = {
-  get_balance: async () => {
-    const agent = new HttpAgent({ host: 'http://127.0.0.1:4943' });
-    agent.fetchRootKey();
-    const backendActor = Actor.createActor(idlFactory, {
-      agent,
-      canisterId: BACKEND_CANISTER_ID,
-    });
-    const balance = await backendActor.get_balance();
-    return balance.toString();
-  },
-
-  increment_balance: async () => {
-    const agent = new HttpAgent({ host: 'http://127.0.0.1:4943' });
-    agent.fetchRootKey();
-    const backendActor = Actor.createActor(idlFactory, {
-      agent,
-      canisterId: BACKEND_CANISTER_ID,
-    });
-    await backendActor.increment_balance();
-  },
-};
+import { useState, useEffect } from 'react';
+import { tap_tap_backend } from 'declarations/tap-tap-backend'; // Import canister methods
+import { AuthClient } from '@dfinity/auth-client'; // Correct import for AuthClient
+import { Principal } from '@dfinity/principal'; // Import Principal for encoding
 
 function App() {
+  const [greeting, setGreeting] = useState('');
+  const [userId, setUserId] = useState('');
+  const [balance, setBalance] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [balance, setBalance] = useState(null);
-  const [principalId, setPrincipalId] = useState(null);
-  const [authClient, setAuthClient] = useState(null);
 
-  const initializeAuthClient = async () => {
-    try {
-      const client = await AuthClient.create();
-      setAuthClient(client);
-      const isAuthenticated = await client.isAuthenticated();
-
-      if (isAuthenticated) {
-        const identity = client.getIdentity();
-        const principalId = identity.getPrincipal().toText();
-        setPrincipalId(principalId);
-        setIsAuthenticated(true);
-        fetchUserData();
-      } else {
-        setIsAuthenticated(false);
-      }
-    } catch (error) {
-      console.error('Failed to initialize auth client:', error);
-    }
-  };
-
-  const handleLogin = async () => {
-    if (authClient) {
-      await authClient.login({
-        identityProvider: 'https://identity.ic0.app/',
-        onSuccess: async () => {
-          await handleAuthSuccess(authClient);
-        },
-        onError: (error) => {
-          console.error('Authentication error:', error);
-        },
-      });
-    }
-  };
-
-  const handleAuthSuccess = async (client) => {
-    try {
-      const identity = client.getIdentity();
-      const principalId = identity.getPrincipal().toText();
-      setPrincipalId(principalId);
-      setIsAuthenticated(true);
-      fetchUserData();
-    } catch (error) {
-      console.error('Error during authentication success:', error);
-    }
-  };
-
-  const fetchUserData = async () => {
-    try {
-      const userBalance = await tap_tap_backend.get_balance();
-      setBalance(userBalance);
-    } catch (error) {
-      console.error('Failed to fetch user data:', error);
-    }
-  };
-
-  const handleIncrementBalance = async () => {
-    try {
-      await tap_tap_backend.increment_balance();
-      fetchUserData();
-    } catch (error) {
-      console.error('Error incrementing balance:', error);
-    }
-  };
-
+  // This effect checks for authentication when the app is mounted
   useEffect(() => {
-    initializeAuthClient();
+    async function checkAuthentication() {
+      try {
+        // Try to get the principal from localStorage
+        const storedPrincipal = localStorage.getItem('principal');
+        
+        if (storedPrincipal) {
+          // If a principal ID is found in localStorage, set user data
+          setUserId(storedPrincipal);
+
+          // Fetch balance for the user
+          await fetchBalanceForUser(storedPrincipal); // Fetch balance after authentication
+          setIsAuthenticated(true); // User is authenticated
+        }
+      } catch (error) {
+        console.error('Error during authentication check:', error);
+        setIsAuthenticated(false); // If an error occurs, the user is not authenticated
+      }
+    }
+
+    checkAuthentication(); // Run the authentication check on component mount
   }, []);
 
+  // Fetch user balance from the backend using get_balance_for_user method
+  const fetchBalanceForUser = async (principalId) => {
+    try {
+      const principal = Principal.fromText(principalId); // Convert string to Principal
+      const balance = await tap_tap_backend.get_balance_for_user(principal); // Call the backend query
+      setBalance(balance.toString()); // Ensure balance is converted to string
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+      setBalance(0); // Set balance to 0 if there's an error
+    }
+  };
+
+  // Handle authentication on button click
+  const handleAuthenticate = async () => {
+    try {
+      const authClient = await AuthClient.create();
+      await authClient.login({
+        identityProvider: 'https://identity.ic0.app', // URL for Internet Identity login
+        onSuccess: async () => {
+          const identity = await authClient.getIdentity();
+          const principal = identity.getPrincipal().toText(); // Get user principal ID
+          setUserId(principal);
+
+          // Store the principal ID in localStorage
+          localStorage.setItem('principal', principal); 
+
+          // Fetch balance after login for the authenticated user
+          await fetchBalanceForUser(principal); // Fetch balance for the authenticated user
+          setIsAuthenticated(true); // Set authenticated state to true
+        }
+      });
+    } catch (error) {
+      console.error('Authentication failed:', error);
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Remove the principal from local storage
+    localStorage.removeItem('principal');
+    setUserId('');
+    setBalance(0);
+    setIsAuthenticated(false);
+  };
+
+  // Handle name submission
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const name = event.target.elements.name.value;
+    tap_tap_backend.greet(name).then((greeting) => {
+      setGreeting(greeting);
+    });
+  };
+
+  // Handle increment balance
+  const handleIncrement = async () => {
+    try {
+      const principal = Principal.fromText(userId); // Convert string to Principal
+      // Call the backend to increment the balance for the current user
+      await tap_tap_backend.increment_balance_for_user(principal); // Increment balance
+      await fetchBalanceForUser(userId); // Re-fetch the balance after increment
+    } catch (error) {
+      console.error('Failed to increment balance:', error);
+    }
+  };
+
   return (
-    <div className="App">
-      {isAuthenticated ? (
+    <main>
+      <img src="/logo2.svg" alt="DFINITY logo" />
+      <br />
+      <br />
+
+      {/* Display authentication button if not authenticated */}
+      {!isAuthenticated ? (
         <div>
-          <h1>Welcome, {principalId}</h1>
-          <h2>User Balance: {balance !== null ? balance : 'Loading...'}</h2>
-          <button onClick={handleIncrementBalance}>Increment Balance</button>
+          <h3>Authenticate with Dfinity</h3>
+          <button onClick={handleAuthenticate}>Authenticate</button> {/* Authentication button */}
         </div>
       ) : (
         <div>
-          <h2>Please log in to view your account</h2>
-          <button onClick={handleLogin}>Login with Auth</button>
+          <h3>User Information</h3>
+          <p>User ID: {userId}</p> {/* Display User ID (Principal) */}
+          <p>Balance: {balance !== null ? balance : 'Loading...'}</p>
+          <button onClick={handleIncrement}>Increase Balance</button>
+          <form action="#" onSubmit={handleSubmit}>
+            <label htmlFor="name">Enter your name: </label>
+            <input id="name" type="text" />
+            <button type="submit">Submit</button>
+          </form>
+          <section>{greeting}</section>
+
+          {/* Logout Button */}
+          <button onClick={handleLogout}>Logout</button>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 
