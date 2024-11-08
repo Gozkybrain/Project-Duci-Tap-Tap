@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500&display=swap');
+
+
+.user-id {
+  font-size: 14px;
+  font-family: 'Arial', sans-serif; /* Or you can use any font you like */
+  color: #ffffff; /* Set a font color */
+  display: flex; /* Use flexbox for alignment */
+  justify-content: flex-end; /* Align to the right */
+  align-items: center; /* Vertically center the content */
+  padding: 10px; /* Add some padding for spacing */
+}
+
+.user-id svg {
+  cursor: pointer;
+  margin-left: 10px; /* Space between the text and icon */
+}
+
+
+
+/* Modal overlay styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* High z-index to sit above other content */
+}
+
+/* Modal content box */
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px 8px 0 0;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Optional shadow */
+  z-index: 1001; /* Ensure it’s above the overlay */
+  text-align: center;
+}
+
+
+.balance {
+    font-family: 'Orbitron', sans-serif; /* Futuristic font */
+    font-size: 3rem; /* Make it large */
+    color: #00f9ff; /* Neon blue text */
+    text-shadow: 
+      0 0 5px rgba(0, 255, 255, 0.7), 
+      0 0 10px rgba(0, 255, 255, 0.7), 
+      0 0 15px rgba(0, 255, 255, 0.7), 
+      0 0 20px rgba(0, 255, 255, 0.7);
+    animation: glitch 1s infinite;
+    position: relative;
+  }
+  
+  .balance::before, .balance::after {
+    content: attr(data-balance); /* Duplicate the text */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    color: #ff00ff; /* Secondary color */
+    text-shadow: 
+      0 0 5px rgba(255, 0, 255, 0.7), 
+      0 0 10px rgba(255, 0, 255, 0.7), 
+      0 0 15px rgba(255, 0, 255, 0.7), 
+      0 0 20px rgba(255, 0, 255, 0.7);
+    transform: translate(2px, -2px); /* Slight offset */
+    animation: glitch-2 1.5s infinite;
+  }
+  
+  /* Glitch effect */
+  @keyframes glitch {
+    0% {
+      transform: translate(1px, 0);
+      opacity: 1;
+    }
+    25% {
+      transform: translate(-2px, 0);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translate(3px, 0);
+      opacity: 1;
+    }
+    75% {
+      transform: translate(-3px, 0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(1px, 0);
+      opacity: 1;
+    }
+  }
+  
+  /* Additional glitch effect */
+  @keyframes glitch-2 {
+    0% {
+      transform: translate(3px, -3px);
+      opacity: 0.7;
+    }
+    25% {
+      transform: translate(-4px, 4px);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translate(2px, -2px);
+      opacity: 0.7;
+    }
+    75% {
+      transform: translate(-3px, 3px);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate(3px, -3px);
+      opacity: 0.7;
+    }
+  }
+  
+  

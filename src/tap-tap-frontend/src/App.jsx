@@ -1,33 +1,53 @@
 import { useState, useEffect } from 'react';
 import GetAuth from './GetAuth';
 import GetUser from './GetUser';
+import MoreGames from './MoreGames';
 import './styles/App.css';
 
 function App() {
+  // State to hold the user's ID, authentication status, and active modal
   const [userId, setUserId] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // Track active modal
+  const [activeModal, setActiveModal] = useState(null);
 
+  // check if the user's principal is saved in localStorage
   useEffect(() => {
     const storedPrincipal = localStorage.getItem('principal');
     if (storedPrincipal) {
+      // If found, set the user ID and mark the user as authenticated
       setUserId(storedPrincipal);
       setIsAuthenticated(true);
     }
   }, []);
 
+  // handle modal actions
+  useEffect(() => {
+    if (activeModal) {
+      // Disable scrolling when modal is active
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+  }, [activeModal]);
+
+  // to handle successful authentication
   const handleAuthSuccess = (principal) => {
+    // Store the principal (user ID) in state and mark user as authenticated
     setUserId(principal);
     setIsAuthenticated(true);
   };
 
+  // handle user logout
   const handleLogout = () => {
+    // Remove the user’s principal from localStorage and update state
     localStorage.removeItem('principal');
     setUserId('');
     setIsAuthenticated(false);
   };
 
+
   const openModal = (modal) => setActiveModal(modal);
+
   const closeModal = () => setActiveModal(null);
 
   return (
@@ -38,55 +58,27 @@ function App() {
         <br />
 
         {!isAuthenticated ? (
+          // If not authenticated, show the GetAuth component
           <GetAuth onAuthSuccess={handleAuthSuccess} />
         ) : (
           <>
+            {/* If authenticated, show the GetUser component with userId */}
             <GetUser userId={userId} onLogout={handleLogout} />
-            {/* Bottom tab bar */}
+
             <div className="bottomTabBar">
-              <button onClick={() => openModal('tab1')}>Tab 1</button>
-              <button onClick={() => openModal('tab2')}>Tab 2</button>
-              <button onClick={() => openModal('tab3')}>Tab 3</button>
+              <button onClick={() => openModal('tab1')}>More Games</button>
+              <button onClick={handleLogout}>Logout</button>
             </div>
           </>
         )}
-
-
-
       </div>
-
-      {/* Bottom tab bar */}
-      {/* <div className="bottomTabBar">
-        <button onClick={() => openModal('tab1')}>Tab 1</button>
-        <button onClick={() => openModal('tab2')}>Tab 2</button>
-        <button onClick={() => openModal('tab3')}>Tab 3</button>
-      </div> */}
 
       {/* Modals */}
       {activeModal === 'tab1' && (
         <div className="modal">
           <div className="modalContent">
-            <h2>Tab 1 Content</h2>
-            <p>This is the content for Tab 1.</p>
-            <button onClick={closeModal}>Close</button>
-          </div>
-        </div>
-      )}
-      {activeModal === 'tab2' && (
-        <div className="modal">
-          <div className="modalContent">
-            <h2>Tab 2 Content</h2>
-            <p>This is the content for Tab 2.</p>
-            <button onClick={closeModal}>Close</button>
-          </div>
-        </div>
-      )}
-      {activeModal === 'tab3' && (
-        <div className="modal">
-          <div className="modalContent">
-            <h2>Tab 3 Content</h2>
-            <p>This is the content for Tab 3.</p>
-            <button onClick={closeModal}>Close</button>
+            <button onClick={closeModal}>x</button>
+            <MoreGames />
           </div>
         </div>
       )}
