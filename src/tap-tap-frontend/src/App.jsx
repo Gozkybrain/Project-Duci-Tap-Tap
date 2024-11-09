@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import GetAuth from './GetAuth';
 import GetUser from './GetUser';
-import MoreGames from './MoreGames';
+import MoreGames from './components/MoreGames';
 import './styles/App.css';
 
 function App() {

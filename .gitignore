@@ -10,6 +10,8 @@
 # dfx temporary files
 .dfx/
 
+test.jsx
+
 # generated files
 **/declarations/
 

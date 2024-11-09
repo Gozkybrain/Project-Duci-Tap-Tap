@@ -1,61 +1,47 @@
-# `tap-tap`
+# Project Duci: Tap Tap
 
-Welcome to your new `tap-tap` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+## Problem Statement
+Traditional gaming systems often manage in-game points, rewards, and user data on centralized Web2 databases, which can lead to transparency and security issues. Players have limited control and visibility over how their data and points are stored, accessed, and managed. Furthermore, such systems typically lack privacy in point balances and require players to rely on intermediaries for reward claims. This creates a gap in decentralized, user-controlled game economies, where players can securely store points, maintain privacy, and redeem tokens on their terms.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
 
-To learn more before you start working with `tap-tap`, see the following documentation available online:
+## Solution
+This project introduces a decentralized gaming points tracker, leveraging blockchain technology to store all user points and data on-chain. By decentralizing the points management system, each player's balance remains private, visible only to the player until they choose to redeem it for tokens. This approach not only ensures security and transparency but also allows for more decentralized gaming ecosystems, where players have full ownership and control over their points. As an evolving system, it aims to include multiple games, offering users a unified platform to manage their points across various titles, securely and privately.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
 
-If you want to start working on your project right away, you might want to try the following commands:
+## Technologies and Languages
 
-```bash
-cd tap-tap/
-dfx help
-dfx canister --help
-```
+### Languages and Frameworks:
+* `React.js:` For the front-end interface, providing an interactive and responsive experience.
+* `Rust:` Backend logic that interacts with the Internet Computer (ICP) for secure, on-chain point storage and retrieval.
 
-## Running the project locally
+### Additional Libraries and Tools:
+* `CSS Animations:` Adds interactive effects for button clicks and point accumulation.
+* `LocalStorage:` For client-side state persistence during temporary events like waiting periods.
+* `Timing Functions:` Implemented with setTimeout and setInterval to manage UI and countdown interactions.
 
-If you want to test your project locally, you can use the following commands:
 
-```bash
-# Starts the replica, running in the background
-dfx start --background
+## Logic and Functionality
+### Point Increment Mechanism:
+* Users tap on an interactive coin button to increment their points balance.
+* Each tap adds a visible "+1" animation near the button, contributing to an engaging user experience.
 
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
-```
+### Temporary Cool down After Multiple Taps:
+* After a specific number of taps (currently set to 18), the app enters a "cool down" phase where users must wait 60 seconds before tapping again.
+* A countdown timer is displayed, and once it reaches zero, the tapping functionality is re-enabled.
+* This countdown is managed via `setInterval` and persists even if the user navigates away, using `localStorage` to store the wait state and resume accurately.
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+### Point Display and Increment Feedback:
+* The current balance is updated on each tap, displaying a cumulative "+balance" during active game play.
+* Once tapping resumes after the cool down, the balance resets visually, ready for the next accumulation phase.
 
-If you have made changes to your backend canister, you can generate a new candid interface with
 
-```bash
-npm run generate
-```
+### Privacy and Security on the Blockchain:
+* Points and user data are stored securely on ICP, ensuring that only the owner can access their balance until a redemption action is taken.
+* This approach enhances data privacy and supports future scaling to integrate additional games under one system.
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+### Responsive and Interactive UI:
+* The app uses CSS animations and styles to create a futuristic aesthetic, enhancing the user experience.
+* Custom fonts, glow effects, and image scaling provide a dynamic, visually engaging interface for players.
 
-If you are making frontend changes, you can start a development server with
-
-```bash
-npm start
-```
-
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
-
-### Note on frontend environment variables
-
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
-
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+## Future Scope
+The app is designed to scale by adding multiple games that can share the same on-chain points system. This expansion would allow users to manage all their game points securely and privately on one platform. The system can also support token claims, where users redeem points in exchange for cryptocurrency, fostering a decentralized game economy.

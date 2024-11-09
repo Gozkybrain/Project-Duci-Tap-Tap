@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/MoreGames.css';
+import '../styles/MoreGames.css';
 
 function MoreGames() {
   return (
